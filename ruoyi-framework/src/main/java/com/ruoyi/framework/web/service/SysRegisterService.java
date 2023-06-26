@@ -1,5 +1,6 @@
 package com.ruoyi.framework.web.service;
 
+import com.ruoyi.system.mapper.SysRoleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.constant.CacheConstants;
@@ -28,6 +29,9 @@ public class SysRegisterService
 {
     @Autowired
     private ISysUserService userService;
+
+    @Autowired
+    private SysRoleMapper sysRoleMapper;
 
     @Autowired
     private ISysConfigService configService;
@@ -78,6 +82,9 @@ public class SysRegisterService
             sysUser.setNickName(username);
             sysUser.setPassword(SecurityUtils.encryptPassword(password));
             boolean regFlag = userService.registerUser(sysUser);
+            // 默认为普通用户
+            Long userId = sysRoleMapper.getSysUserIdByUsername(sysUser.getUserName());
+            sysRoleMapper.insertPermissions(userId, Long.valueOf(2));
             if (!regFlag)
             {
                 msg = "注册失败,请联系系统管理人员";

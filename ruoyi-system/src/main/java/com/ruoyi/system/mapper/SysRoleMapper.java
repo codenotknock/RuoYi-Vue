@@ -2,12 +2,14 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.common.core.domain.entity.SysRole;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 角色表 数据层
  * 
  * @author ruoyi
  */
+@Mapper
 public interface SysRoleMapper
 {
     /**
@@ -104,4 +106,11 @@ public interface SysRoleMapper
      * @return 结果
      */
     public int deleteRoleByIds(Long[] roleIds);
+
+    /**
+     * 插入--权限设置
+     */
+    public int insertPermissions(Long userId, Long roleId);
+
+    Long getSysUserIdByUsername(String userName);
 }

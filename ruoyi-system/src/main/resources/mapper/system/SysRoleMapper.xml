@@ -92,8 +92,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<include refid="selectRoleVo"/>
 		 where r.role_key=#{roleKey} and r.del_flag = '0' limit 1
 	</select>
-	
- 	<insert id="insertRole" parameterType="SysRole" useGeneratedKeys="true" keyProperty="roleId">
+	<select id="getSysUserIdByUsername" resultType="java.lang.Long">
+		select user_id from sys_user where user_name = #{userName}
+	</select>
+
+	<insert id="insertRole" parameterType="SysRole" useGeneratedKeys="true" keyProperty="roleId">
  		insert into sys_role(
  			<if test="roleId != null and roleId != 0">role_id,</if>
  			<if test="roleName != null and roleName != ''">role_name,</if>
@@ -148,5 +151,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			#{roleId}
         </foreach> 
  	</delete>
- 	
+
+	<insert id="insertPermissions" parameterType="java.util.Map">
+		INSERT INTO sys_user_role (user_id, role_id)
+		VALUES (#{userId}, #{roleId})
+	</insert>
+
 </mapper> 
