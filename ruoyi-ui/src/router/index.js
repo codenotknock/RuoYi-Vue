@@ -46,6 +46,11 @@ export const constantRoutes = [
     component: () => import('@/views/login'),
     hidden: true
   },
+  // {
+  //   path: '/tra/pullCount',
+  //   component: () => import('@/views/system/pullCount'),
+  //   hidden: true
+  // },
   {
     path: '/register',
     component: () => import('@/views/register'),

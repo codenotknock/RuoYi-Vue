@@ -62,4 +62,6 @@ public interface TraInfoMapper
     public int deleteTraInfoByIds(Long[] ids);
 
     Long getSysUserIdByUsername(String userName);
+
+    TraInfo selectTraInfoByUserName(String username);
 }

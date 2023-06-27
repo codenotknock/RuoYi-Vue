@@ -38,6 +38,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="getSysUserIdByUsername" resultType="java.lang.Long">
         select user_id from sys_user where user_name = #{userName}
     </select>
+    <select id="selectTraInfoByUserName" resultType="com.ruoyi.system.domain.TraInfo">
+        SELECT * FROM tra_info WHERE user_name = #{username}
+    </select>
 
     <insert id="insertTraInfo" parameterType="TraInfo" useGeneratedKeys="true" keyProperty="id">
         insert into tra_info

@@ -34,6 +34,7 @@ public class TraGradesController extends BaseController
     @Autowired
     private ITraGradesService traGradesService;
 
+
     /**
      * 查询训练成绩列表
      */
@@ -76,6 +77,14 @@ public class TraGradesController extends BaseController
     @Log(title = "训练成绩", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody TraGrades traGrades)
+    {
+        return toAjax(traGradesService.insertTraGrades(traGrades));
+    }
+
+    // 无安全验证
+    @Log(title = "训练成绩", businessType = BusinessType.INSERT)
+    @PostMapping("/save")
+    public AjaxResult save(@RequestBody TraGrades traGrades)
     {
         return toAjax(traGradesService.insertTraGrades(traGrades));
     }

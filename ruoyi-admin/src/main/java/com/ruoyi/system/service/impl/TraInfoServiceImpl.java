@@ -14,14 +14,13 @@ import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.system.cons.Constant;
 import com.ruoyi.system.mapper.SysRoleMapper;
+import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.TraInfoMapper;
 import com.ruoyi.system.domain.TraInfo;
 import com.ruoyi.system.service.ITraInfoService;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 训练成员信息Service业务层处理
@@ -41,6 +40,8 @@ public class TraInfoServiceImpl implements ITraInfoService
     @Autowired
     private SysRoleMapper sysRoleMapper;
 
+    @Autowired
+    private SysUserMapper sysUserMapper;
     /**
      * 查询训练成员信息
      * 
@@ -126,7 +127,12 @@ public class TraInfoServiceImpl implements ITraInfoService
             sysUser.setPassword(SecurityUtils.encryptPassword(password));
             sysUser.setPhonenumber(traInfo.getPhonenumber());
             sysUser.setSex(traInfo.getSex());
-            sysUser.setNickName(traInfo.getTraInfoName());  //昵称就是训练名字
+
+            if (traInfo.getTraInfoName() != null) {
+                sysUser.setNickName(traInfo.getTraInfoName());  //昵称就是训练名字
+            } else {
+                sysUser.setNickName(username);
+            }
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag)
             {
@@ -136,8 +142,9 @@ public class TraInfoServiceImpl implements ITraInfoService
             else
             {
                 // 默认为普通用户
-                Long userId = traInfoMapper.getSysUserIdByUsername(sysUser.getUserName());
-                sysRoleMapper.insertPermissions(userId, Constant.RoleId);
+                SysUser sysUser1 = sysUserMapper.selectUserByUserName(username);
+                sysRoleMapper.insertPermissions(sysUser1.getUserId(), Constant.RoleId);
+
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success")));
             }
         }
@@ -145,16 +152,26 @@ public class TraInfoServiceImpl implements ITraInfoService
 
     /**
      * 修改训练成员信息
-     * 不能修改账号密码
+     * bug不能修改账号密码--修复
      * @param traInfo 训练成员信息
      * @return 结果
      */
     @Override
     public int updateTraInfo(TraInfo traInfo)
     {
+//        updateSysUserTra(traInfo);
         return traInfoMapper.updateTraInfo(traInfo);
     }
 
+    private void updateSysUserTra(TraInfo traInfo) {
+        SysUser sysUser = sysUserMapper.selectUserByUserName(traInfo.getUserName());
+        sysUser.setUserName(traInfo.getUserName());
+        sysUser.setSex(traInfo.getSex());
+        String password = SecurityUtils.encryptPassword(traInfo.getPassword());
+        sysUser.setPassword(password);
+        sysUser.setPhonenumber(traInfo.getPhonenumber());
+        sysUserMapper.updateUser(sysUser);
+    }
     /**
      * 批量删除训练成员信息
      * 
@@ -164,8 +181,16 @@ public class TraInfoServiceImpl implements ITraInfoService
     @Override
     public int deleteTraInfoByIds(Long[] ids)
     {
-        // 有bug，不想写了
+//        deleteSysUserTraByIds(ids);
+        // 有bug，不想写了--已解决
         return traInfoMapper.deleteTraInfoByIds(ids);
+    }
+    private void deleteSysUserTraByIds(Long[] ids) {
+        // 权限分配表
+        sysRoleMapper.deleteRoleByIds(ids);
+        // sys表
+        sysUserMapper.deleteUserByIds(ids);
+
     }
 
     /**
@@ -177,8 +202,15 @@ public class TraInfoServiceImpl implements ITraInfoService
     @Override
     public int deleteTraInfoById(Long id)
     {
-        // 有bug，不想写了
+//        deleteSysUserTraById(id);
+        // 有bug，不想写了 -- 已解决
         return traInfoMapper.deleteTraInfoById(id);
+    }
+    private void deleteSysUserTraById(Long id){
+        // 权限分配表
+        sysRoleMapper.deleteRoleById(id);
+        // sys_user表
+        sysUserMapper.deleteUserById(id);
     }
 
 

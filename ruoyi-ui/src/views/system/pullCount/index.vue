@@ -2,12 +2,13 @@
   <div>
     <h1>引体向上计数器</h1>
     <p>{{ status }}</p>
-    <!-- 将canvas元素添加到Vue模板中 -->
-    <canvas ref="canvas"></canvas>
     <!-- 添加开始、停止和保存按钮 -->
     <button @click="startCounting" :disabled="pullUpStarted">开始训练</button>
     <button @click="stopCounting" :disabled="!pullUpStarted">停止训练</button>
     <button @click="saveTraining">保存训练数据</button>
+
+    <!-- 将canvas元素添加到Vue模板中 -->
+    <canvas ref="canvas" id="canvas"  width="150" height="150"></canvas>
   </div>
 </template>
 
@@ -16,7 +17,7 @@
 import Vue from 'vue';
 import p5 from 'p5';
 import ml5 from 'ml5';
-import { addTraGrades } from "@/api/system/traGrades";
+import { saveTraGrades } from "@/api/system/pullCount";
 
 export default {
   data() {
@@ -43,8 +44,26 @@ export default {
   mounted() {
     // 在Vue的mounted钩子函数中创建p5.js画布
     this.video = this.$refs.canvas;
-    this.poseNet = ml5.poseNet(this.video, this.modelLoad);
-    this.poseNet.on('pose', this.gotPoses);
+    if (this.video){
+      this.video.addEventListener('canplay', () => {
+        // 视频加载完成后执行的逻辑
+        this.poseNet = ml5.poseNet(this.video, this.modelLoad);
+        this.poseNet.on('pose', this.gotPoses);
+      });
+    }
+    if (!this.video) {
+      console.warn("视频元素未正确加载");
+      return;
+    }
+    // this.video.addEventListener('canplay', () => {
+    //   // 视频加载完成后执行的逻辑
+    //
+    // });
+    // this.video.addEventListener('error', (event) => {
+    //   console.error('加载错误:', event.target.error.message);
+    // });
+    // this.poseNet = ml5.poseNet(this.video, this.modelLoad);
+    // this.poseNet.on('pose', this.gotPoses);
   },
   methods: {
     modelLoad() {
@@ -75,7 +94,7 @@ export default {
       this.sendData(this.formData);
     },
     sendData(formData) {
-      addTraGrades(formData).then(response => {
+      saveTraGrades(formData).then(response => {
         this.$modal.msgSuccess("训练结果已保存");
         // this.$router.push('/success-page'); // 在新增成功后跳转到数据页面
       });
@@ -190,7 +209,7 @@ export default {
 
     // 创建p5.js画布
     const p5Instance = new p5(this.draw.bind(this));
-    p5Instance.createCanvas(640, 480).parent('canvas');
+    p5Instance.createCanvas(150, 150).parent('#canvas');
   }
 };
 </script>

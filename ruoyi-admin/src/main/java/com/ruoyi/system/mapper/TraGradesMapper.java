@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.TraGrades;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 训练成绩Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.system.domain.TraGrades;
  * @author ldu
  * @date 2023-06-27
  */
+@Mapper
 public interface TraGradesMapper 
 {
     /**

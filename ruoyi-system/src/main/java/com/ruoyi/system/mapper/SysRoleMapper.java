@@ -3,6 +3,7 @@ package com.ruoyi.system.mapper;
 import java.util.List;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 角色表 数据层
@@ -110,7 +111,7 @@ public interface SysRoleMapper
     /**
      * 插入--权限设置
      */
-    public int insertPermissions(Long userId, Long roleId);
+    public int insertPermissions(@Param("userId")Long userId, @Param("roleId")Long roleId);
 
     Long getSysUserIdByUsername(String userName);
 }
